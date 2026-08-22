@@ -211,6 +211,14 @@ List<SettingsModel> get playSettings => [
       setKey: SettingBoxKey.continuePlayInBackground,
       defaultVal: false,
     ),
+  if (PlatformUtils.isMobile)
+    const SwitchModel(
+      title: '失去焦点自动暂停',
+      subtitle: '进入后台或切换到其他页面时自动暂停播放',
+      leading: Icon(Icons.pause_circle_outline),
+      setKey: SettingBoxKey.pauseOnFocusLost,
+      defaultVal: false,
+    ),
   if (Platform.isAndroid) ...[
     SwitchModel(
       title: '后台画中画',

@@ -242,6 +242,14 @@ List<SettingsModel> get extraSettings => [
     onTap: _showTouchSlopDialog,
     leading: const Icon(Icons.pan_tool_alt_outlined),
   ),
+  if (Platform.isAndroid)
+    NormalModel(
+      title: '系统手势边缘宽度',
+      getSubtitle: () =>
+          '当前: ${Pref.systemGestureEdgeWidth}dp（右侧区域不响应横滑，避免与返回手势冲突）',
+      onTap: _showSystemGestureEdgeWidthDialog,
+      leading: const Icon(Icons.swipe_left_outlined),
+    ),
   NormalModel(
     title: '刷新滑动距离',
     leading: const Icon(Icons.refresh),
@@ -904,6 +912,63 @@ void _showTouchSlopDialog(BuildContext context, VoidCallback setState) {
               Get.back();
               touchSlopH = val;
               await GStorage.setting.put(SettingBoxKey.touchSlopH, val);
+              setState();
+            } catch (e) {
+              SmartDialog.showToast(e.toString());
+            }
+          },
+          child: const Text('确定'),
+        ),
+      ],
+    ),
+  );
+}
+
+void _showSystemGestureEdgeWidthDialog(
+  BuildContext context,
+  VoidCallback setState,
+) {
+  String initialValue = Pref.systemGestureEdgeWidth.toString();
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('系统手势边缘宽度'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '右侧屏幕边缘内该宽度范围的横向滑动将让系统手势优先（避免与系统返回手势冲突）',
+            style: TextStyle(fontSize: 13),
+          ),
+          const SizedBox(height: 12),
+          TextFormField(
+            autofocus: true,
+            initialValue: initialValue,
+            keyboardType: const .numberWithOptions(decimal: true),
+            onChanged: (value) => initialValue = value,
+            inputFormatters: FilteringText.decimal,
+            decoration: const InputDecoration(suffixText: 'dp'),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: Get.back,
+          child: Text(
+            '取消',
+            style: TextStyle(color: ColorScheme.of(context).outline),
+          ),
+        ),
+        TextButton(
+          onPressed: () async {
+            try {
+              final val = double.parse(initialValue);
+              Get.back();
+              await GStorage.setting.put(
+                SettingBoxKey.systemGestureEdgeWidth,
+                val,
+              );
               setState();
             } catch (e) {
               SmartDialog.showToast(e.toString());

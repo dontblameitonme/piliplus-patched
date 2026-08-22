@@ -10,7 +10,9 @@ Widget tabBarView({
   controller: controller,
   physics: clampingScrollPhysics,
   horizontalDragGestureRecognizer: CustomHorizontalDragGestureRecognizer.new,
-  children: children,
+  children: children
+      .map((child) => RepaintBoundary(child: child))
+      .toList(growable: false),
 );
 
 SpringDescription _customSpringDescription() {

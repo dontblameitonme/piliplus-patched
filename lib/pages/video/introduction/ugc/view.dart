@@ -718,13 +718,9 @@ class _UgcIntroPanelState extends State<UgcIntroPanel> {
                 () {
                   if (mid != null) {
                     feedBack();
-                    if (!isPortrait && introController.horizontalMemberPage) {
-                      widget.onShowMemberPage(mid);
-                    } else {
-                      Get.toNamed(
-                        '/member?mid=$mid&from_view_aid=${videoDetailCtr.aid}',
-                      );
-                    }
+                    Get.toNamed(
+                      '/member?mid=$mid&from_view_aid=${videoDetailCtr.aid}',
+                    );
                   }
                 },
               ),
@@ -757,15 +753,7 @@ class _UgcIntroPanelState extends State<UgcIntroPanel> {
     );
     return GestureDetector(
       behavior: .opaque,
-      onTap: () {
-        if (item.mid == ownerMid &&
-            !isPortrait &&
-            introController.horizontalMemberPage) {
-          widget.onShowMemberPage(ownerMid);
-        } else {
-          onTap();
-        }
-      },
+      onTap: onTap,
       onSecondaryTap:
           PlatformUtils.isDesktop && introController.horizontalMemberPage
           ? onTap

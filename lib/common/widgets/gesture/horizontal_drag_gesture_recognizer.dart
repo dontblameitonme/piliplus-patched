@@ -43,6 +43,9 @@ class CustomHorizontalDragGestureRecognizer
 
 double touchSlopH = Pref.touchSlopH;
 
+/// 系统返回手势边缘宽度（dp），从设置读取，默认 20dp
+double get _systemGestureEdgeWidth => Pref.systemGestureEdgeWidth;
+
 bool _computeHitSlop(
   double globalDistanceMoved,
   DeviceGestureSettings settings,
@@ -50,6 +53,15 @@ bool _computeHitSlop(
   Offset? initialPosition,
   Offset lastPosition,
 ) {
+  // 若触摸起点在右侧系统手势区内（系统返回手势区域），放弃竞争
+  if (initialPosition != null) {
+    final view = PlatformDispatcher.instance.views.first;
+    final screenWidth =
+        view.physicalSize.width / view.devicePixelRatio;
+    if (initialPosition.dx > screenWidth - _systemGestureEdgeWidth) {
+      return false;
+    }
+  }
   switch (kind) {
     case .mouse:
       return globalDistanceMoved > kPrecisePointerHitSlop;

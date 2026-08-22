@@ -155,7 +155,9 @@ abstract final class SettingBoxKey {
       floatingNavBar = 'floatingNavBar',
       removeSafeArea = 'removeSafeArea',
       angleDegrees = 'angleDegrees',
-      liveStream = 'liveStream';
+      liveStream = 'liveStream',
+      pauseOnFocusLost = 'pauseOnFocusLost',
+      systemGestureEdgeWidth = 'systemGestureEdgeWidth';
 
   static const String minimizeOnExit = 'minimizeOnExit',
       windowSize = 'windowSize',

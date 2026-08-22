@@ -61,6 +61,7 @@ import 'package:PiliPlus/utils/num_utils.dart';
 import 'package:PiliPlus/utils/page_utils.dart';
 import 'package:PiliPlus/utils/storage.dart';
 import 'package:PiliPlus/utils/storage_key.dart';
+import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:PiliPlus/utils/theme_utils.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
@@ -192,6 +193,10 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     } else if (state == .paused) {
       introController.cancelTimer();
       ctr.showDanmaku = false;
+      // 失去焦点自动暂停（进入后台）
+      if (Pref.pauseOnFocusLost) {
+        plPlayerController?.pause();
+      }
     }
   }
 
