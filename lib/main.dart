@@ -134,6 +134,10 @@ void main() async {
 
   SmartDialog.config.toast = SmartConfigToast(displayType: .onlyRefresh);
 
+  PaintingBinding.instance.imageCache
+    ..maximumSizeBytes = 256 << 20
+    ..maximumSize = 2000;
+
   if (PlatformUtils.isMobile) {
     SystemChrome.setEnabledSystemUIMode(.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(

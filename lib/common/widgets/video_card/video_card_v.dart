@@ -87,8 +87,9 @@ class VideoCardV extends StatelessWidget {
       cover: videoItem.cover,
       bvid: videoItem.bvid,
     );
-    return Stack(
-      clipBehavior: Clip.none,
+    return RepaintBoundary(
+      child: Stack(
+        clipBehavior: Clip.none,
       children: [
         Card(
           clipBehavior: Clip.hardEdge,
@@ -147,8 +148,9 @@ class VideoCardV extends StatelessWidget {
             ),
           ),
       ],
-    );
-  }
+    ),
+  );
+}
 
   Widget content(BuildContext context) {
     final theme = Theme.of(context);

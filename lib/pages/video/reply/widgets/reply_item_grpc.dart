@@ -253,45 +253,47 @@ class ReplyItemGrpc extends StatelessWidget {
       final garb = replyItem.memberV2.garb;
       if (garb.hasCardImage()) {
         const double height = 38.0;
-        return Stack(
-          clipBehavior: .none,
-          children: [
-            Positioned(
-              top: 0,
-              right: 0,
-              height: height,
-              child: CachedNetworkImage(
-                height: height,
-                memCacheHeight: height.cacheSize(context),
-                imageUrl: ImageUtils.safeThumbnailUrl(garb.cardImage),
-                placeholder: (_, _) => const SizedBox.shrink(),
-              ),
-            ),
-            if (garb.hasCardNumber())
+        return RepaintBoundary(
+          child: Stack(
+            clipBehavior: .none,
+            children: [
               Positioned(
                 top: 0,
                 right: 0,
                 height: height,
-                child: Center(
-                  child: Text(
-                    '${garb.fanNumPrefix}\n${garb.cardNumber}',
-                    style: TextStyle(
-                      fontSize: 8,
-                      fontFamily: Assets.digitalNum,
-                      color: ColourUtils.parseColor(garb.cardFanColor),
+                child: CachedNetworkImage(
+                  height: height,
+                  memCacheHeight: height.cacheSize(context),
+                  imageUrl: ImageUtils.safeThumbnailUrl(garb.cardImage),
+                  placeholder: (_, _) => const SizedBox.shrink(),
+                ),
+              ),
+              if (garb.hasCardNumber())
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  height: height,
+                  child: Center(
+                    child: Text(
+                      '${garb.fanNumPrefix}\n${garb.cardNumber}',
+                      style: TextStyle(
+                        fontSize: 8,
+                        fontFamily: Assets.digitalNum,
+                        color: ColourUtils.parseColor(garb.cardFanColor),
+                      ),
                     ),
                   ),
                 ),
+              Padding(
+                padding: const .only(right: 80),
+                child: header,
               ),
-            Padding(
-              padding: const .only(right: 80),
-              child: header,
-            ),
-          ],
+            ],
+          ),
         );
       }
     }
-    return header;
+    return RepaintBoundary(child: header);
   }
 
   Widget _buildVoteOption(

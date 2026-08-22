@@ -38,6 +38,11 @@ class _SearchPageState extends State<SearchPage> {
       SSearchController(_tag),
       tag: _tag,
     );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _searchController.searchFocusNode.requestFocus();
+      }
+    });
   }
 
   @override
@@ -117,7 +122,6 @@ class _SearchPageState extends State<SearchPage> {
       const SizedBox(width: 10),
     ],
     title: TextField(
-      autofocus: true,
       focusNode: _searchController.searchFocusNode,
       controller: _searchController.controller,
       textInputAction: TextInputAction.search,

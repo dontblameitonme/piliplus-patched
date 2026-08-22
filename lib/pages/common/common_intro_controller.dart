@@ -78,7 +78,8 @@ abstract class CommonIntroController extends GetxController
     heroTag = args['heroTag'];
     bvid = args['bvid'];
     cid = RxInt(args['cid']);
-    hasLater.value = args['sourceType'] == SourceType.watchLater;
+    hasLater.value =
+        args['hasLater'] == true || args['sourceType'] == SourceType.watchLater;
 
     queryVideoIntro();
     startTimer();

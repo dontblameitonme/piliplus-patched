@@ -80,19 +80,21 @@ class _LaterViewChildPageState extends State<LaterViewChildPage>
                         cover: videoItem.pic,
                         title: videoItem.title,
                         dimension: videoItem.dimension,
-                        extraArguments: {
-                          'sourceType': SourceType.watchLater,
-                          if (_baseCtr.isPlayAll.value) ...{
-                            'oid': videoItem.aid,
-                            'count': _laterController
-                                .baseCtr
-                                .counts[LaterViewType.all.index],
-                            'favTitle': '稍后再看',
-                            'mediaId': _laterController.mid,
-                            'desc': _laterController.asc.value,
-                            'isContinuePlaying': index != 0,
-                          },
-                        },
+                        extraArguments: _baseCtr.isPlayAll.value
+                            ? {
+                                'oid': videoItem.aid,
+                                'sourceType': SourceType.watchLater,
+                                'count': _laterController
+                                    .baseCtr
+                                    .counts[LaterViewType.all.index],
+                                'favTitle': '稍后再看',
+                                'mediaId': _laterController.mid,
+                                'desc': _laterController.asc.value,
+                                'isContinuePlaying': index != 0,
+                              }
+                            : {
+                                'hasLater': true,
+                              },
                       );
                     },
                   );
