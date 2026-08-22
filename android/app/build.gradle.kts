@@ -1,5 +1,5 @@
 import com.android.build.gradle.internal.api.ApkVariantOutputImpl
-import org.jetbrains.kotlin.konan.properties.Properties
+import java.util.Properties
 
 plugins {
     id("com.android.application")
@@ -37,22 +37,26 @@ android {
 
     packagingOptions.jniLibs.useLegacyPackaging = true
 
-    val keyProperties = Properties().also {
+    val keyProperties = Properties().apply {
         val properties = rootProject.file("key.properties")
-        if (properties.exists())
-            it.load(properties.inputStream())
+        if (properties.exists()) {
+            properties.inputStream().use { load(it) }
+        }
     }
 
-    val config = keyProperties.getProperty("storeFile")?.let {
+    val config = if (keyProperties.containsKey("storeFile")) {
         signingConfigs.create("release") {
-            storeFile = file(it)
+            val storeFilePath = keyProperties.getProperty("storeFile")
+            storeFile = rootProject.file(storeFilePath).takeIf { it.exists() } ?: file(storeFilePath)
             storePassword = keyProperties.getProperty("storePassword")
             keyAlias = keyProperties.getProperty("keyAlias")
             keyPassword = keyProperties.getProperty("keyPassword")
             enableV1Signing = true
             enableV2Signing = true
+            enableV3Signing = true
+            enableV4Signing = true
         }
-    }
+    } else null
 
     buildFeatures {
         if (project.hasProperty("dev")) {
