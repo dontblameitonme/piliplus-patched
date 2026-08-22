@@ -5,7 +5,6 @@ import 'package:PiliPlus/common/widgets/image/network_img_layer.dart';
 import 'package:PiliPlus/common/widgets/progress_bar/video_progress_indicator.dart';
 import 'package:PiliPlus/common/widgets/select_mask.dart';
 import 'package:PiliPlus/common/widgets/stat/stat.dart';
-import 'package:PiliPlus/http/search.dart';
 import 'package:PiliPlus/models/common/badge_type.dart';
 import 'package:PiliPlus/models/common/stat_type.dart';
 import 'package:PiliPlus/models_new/later/list.dart';
@@ -14,7 +13,6 @@ import 'package:PiliPlus/utils/duration_utils.dart';
 import 'package:PiliPlus/utils/page_utils.dart';
 import 'package:PiliPlus/utils/platform_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 // 视频卡片 - 水平布局
 class VideoCardHLater extends StatelessWidget {
@@ -28,7 +26,7 @@ class VideoCardHLater extends StatelessWidget {
   final int index;
   final BaseLaterController ctr;
   final LaterItemModel videoItem;
-  final ValueChanged<int> onViewLater;
+  final ValueChanged<int?> onViewLater;
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +46,7 @@ class VideoCardHLater extends StatelessWidget {
         onSecondaryTap: PlatformUtils.isMobile ? null : onLongPress,
         onTap: enableMultiSelect
             ? () => ctr.onSelect(videoItem)
-            : () async {
+            : () {
                 if (videoItem.isPugv ?? false) {
                   PageUtils.viewPugv(seasonId: videoItem.aid);
                   return;
@@ -61,19 +59,7 @@ class VideoCardHLater extends StatelessWidget {
                   }
                   return;
                 }
-                try {
-                  final cid =
-                      videoItem.cid ??
-                      await SearchHttp.ab2c(
-                        aid: videoItem.aid,
-                        bvid: videoItem.bvid,
-                      );
-                  if (cid != null) {
-                    onViewLater(cid);
-                  }
-                } catch (err) {
-                  SmartDialog.showToast(err.toString());
-                }
+                onViewLater(videoItem.cid);
               },
         child: Padding(
           padding: const EdgeInsets.symmetric(

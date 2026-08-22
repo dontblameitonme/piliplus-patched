@@ -5,7 +5,6 @@ import 'package:PiliPlus/common/widgets/image/network_img_layer.dart';
 import 'package:PiliPlus/common/widgets/image_grid/image_grid_view.dart';
 import 'package:PiliPlus/http/dynamics.dart';
 import 'package:PiliPlus/http/loading_state.dart';
-import 'package:PiliPlus/http/search.dart';
 import 'package:PiliPlus/models/common/image_preview_type.dart'
     show SourceModel;
 import 'package:PiliPlus/models/common/image_type.dart';
@@ -14,7 +13,6 @@ import 'package:PiliPlus/pages/dynamics/widgets/vote.dart';
 import 'package:PiliPlus/utils/page_utils.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 
 const _linkFoldedText = '网页链接';
@@ -245,22 +243,10 @@ TextSpan? richNode(
                   text: '${i.text} ',
                   style: style,
                   recognizer: NoDeadlineTapGestureRecognizer()
-                    ..onTap = () async {
-                      try {
-                        final res = await SearchHttp.ab2cWithDimension(
-                          bvid: i.rid,
-                        );
-                        final cid = res?.cid;
-                        if (cid != null) {
-                          PageUtils.toVideoPage(
-                            bvid: i.rid,
-                            cid: cid,
-                            dimension: res!.dimension,
-                          );
-                        }
-                      } catch (err) {
-                        SmartDialog.showToast(err.toString());
-                      }
+                    ..onTap = () {
+                      PageUtils.toVideoPage(
+                        bvid: i.rid,
+                      );
                     },
                 ),
               );

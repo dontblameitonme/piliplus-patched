@@ -77,7 +77,7 @@ abstract class CommonIntroController extends GetxController
     final args = Get.arguments;
     heroTag = args['heroTag'];
     bvid = args['bvid'];
-    cid = RxInt(args['cid']);
+    cid = RxInt(args['cid'] ?? 0);
     hasLater.value =
         args['hasLater'] == true || args['sourceType'] == SourceType.watchLater;
 

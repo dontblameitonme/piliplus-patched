@@ -11,6 +11,7 @@ import 'package:PiliPlus/grpc/dm.dart';
 import 'package:PiliPlus/http/fav.dart';
 import 'package:PiliPlus/http/init.dart';
 import 'package:PiliPlus/http/loading_state.dart';
+import 'package:PiliPlus/http/search.dart';
 import 'package:PiliPlus/http/user.dart';
 import 'package:PiliPlus/http/video.dart';
 import 'package:PiliPlus/models/common/account_type.dart';
@@ -361,7 +362,7 @@ class VideoDetailController extends GetxController
 
     bvid = args['bvid'];
     aid = args['aid'];
-    cid = RxInt(args['cid']);
+    cid = RxInt(args['cid'] ?? 0);
     epId = args['epId'];
     seasonId = args['seasonId'];
     pgcType = args['pgcType'];
@@ -803,6 +804,19 @@ class VideoDetailController extends GetxController
       return;
     }
     isQuerying = true;
+    if (cid.value == 0) {
+      final res = await SearchHttp.ab2cWithDimension(aid: aid, bvid: bvid);
+      if (res != null && res.cid != null) {
+        cid.value = res.cid!;
+        if (res.dimension != null) {
+          isVertical.value = res.dimension!.isVertical;
+        }
+      }
+    }
+    if (cid.value == 0) {
+      isQuerying = false;
+      return;
+    }
     if (plPlayerController.enableSponsorBlock && isBlock && !fromReset) {
       querySponsorBlock(bvid: bvid, cid: cid.value);
     }

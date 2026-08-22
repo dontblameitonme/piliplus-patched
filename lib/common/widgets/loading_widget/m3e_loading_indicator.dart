@@ -115,19 +115,21 @@ class _M3ELoadingIndicatorState extends State<M3ELoadingIndicator>
   @override
   Widget build(BuildContext context) {
     final color = widget.color ?? ColorScheme.of(context).secondaryFixedDim;
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        final progress = _controller.value;
-        return RawM3ELoadingIndicator(
-          // key: widget.childKey,
-          morph: _morphs[_morphIndex % _morphs.length],
-          progress: progress,
-          angle: _calcAngle(progress),
-          color: color,
-          size: widget.size,
-        );
-      },
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          final progress = _controller.value;
+          return RawM3ELoadingIndicator(
+            // key: widget.childKey,
+            morph: _morphs[_morphIndex % _morphs.length],
+            progress: progress,
+            angle: _calcAngle(progress),
+            color: color,
+            size: widget.size,
+          );
+        },
+      ),
     );
   }
 }

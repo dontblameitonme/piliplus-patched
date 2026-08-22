@@ -558,7 +558,7 @@ abstract final class PageUtils {
     VideoType videoType = VideoType.ugc,
     int? aid,
     String? bvid,
-    required int cid,
+    int? cid,
     int? seasonId,
     int? epId,
     int? pgcType,
@@ -570,10 +570,12 @@ abstract final class PageUtils {
     bool isVertical = false,
     Dimension? dimension,
   }) {
+    final effectiveAid = aid ?? (bvid != null ? IdUtils.bv2av(bvid) : null);
+    final effectiveBvid = bvid ?? (aid != null ? IdUtils.av2bv(aid) : null);
     final arguments = {
-      'aid': aid ?? IdUtils.bv2av(bvid!),
-      'bvid': bvid ?? IdUtils.av2bv(aid!),
-      'cid': cid,
+      'aid': ?effectiveAid,
+      'bvid': ?effectiveBvid,
+      'cid': cid ?? 0,
       'seasonId': ?seasonId,
       'epId': ?epId,
       'pgcType': ?pgcType,
@@ -582,7 +584,7 @@ abstract final class PageUtils {
       'progress': ?progress,
       'videoType': videoType,
       'isVertical': dimension?.isVertical ?? isVertical,
-      'heroTag': Utils.makeHeroTag(cid),
+      'heroTag': Utils.makeHeroTag(cid ?? bvid ?? aid ?? effectiveBvid),
       ...?extraArguments,
     };
     if (off) {

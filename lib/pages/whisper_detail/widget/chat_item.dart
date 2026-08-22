@@ -321,30 +321,15 @@ class ChatItem extends StatelessWidget {
             ),
             for (final i in content['sub_cards'])
               GestureDetector(
-                onTap: () async {
+                onTap: () {
                   String? bvid = IdUtils.bvRegex
                       .firstMatch(i['jump_url'])
                       ?.group(0);
                   if (bvid != null) {
-                    try {
-                      SmartDialog.showLoading();
-                      final res = await SearchHttp.ab2cWithDimension(
-                        bvid: bvid,
-                      );
-                      final cid = res?.cid;
-                      SmartDialog.dismiss();
-                      if (cid != null) {
-                        PageUtils.toVideoPage(
-                          bvid: bvid,
-                          cid: cid,
-                          cover: i['cover_url'],
-                          dimension: res!.dimension,
-                        );
-                      }
-                    } catch (err) {
-                      SmartDialog.dismiss();
-                      SmartDialog.showToast(err.toString());
-                    }
+                    PageUtils.toVideoPage(
+                      bvid: bvid,
+                      cover: i['cover_url'],
+                    );
                   } else {
                     SmartDialog.showToast('未匹配到 BV 号');
                     PageUtils.handleWebview(i['jump_url']);
