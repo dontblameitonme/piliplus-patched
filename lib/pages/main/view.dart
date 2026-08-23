@@ -343,22 +343,26 @@ class _MainAppState extends PopScopeState<MainApp>
       if (_mainController.hideBottomBar) {
         if (_mainController.barOffset case final barOffset?) {
           return Obx(
-            () => FractionalTranslation(
-              translation: Offset(
-                0.0,
-                barOffset.value / Style.topBarHeight,
+            () => RepaintBoundary(
+              child: FractionalTranslation(
+                translation: Offset(
+                  0.0,
+                  barOffset.value / Style.topBarHeight,
+                ),
+                child: bottomNav,
               ),
-              child: bottomNav,
             ),
           );
         }
         if (_mainController.showBottomBar case final showBottomBar?) {
           return Obx(
-            () => AnimatedSlide(
-              curve: Curves.easeInOutCubicEmphasized,
-              duration: const Duration(milliseconds: 500),
-              offset: Offset(0, showBottomBar.value ? 0 : 1),
-              child: bottomNav,
+            () => RepaintBoundary(
+              child: AnimatedSlide(
+                curve: Curves.easeInOutCubicEmphasized,
+                duration: const Duration(milliseconds: 500),
+                offset: Offset(0, showBottomBar.value ? 0 : 1),
+                child: bottomNav,
+              ),
             ),
           );
         }

@@ -141,37 +141,37 @@ class _SearchPageState extends State<SearchPage> {
       return list.isNotEmpty &&
               list.first.term != null &&
               _searchController.controller.text != ''
-          ? SliverList.list(
-              children: list
-                  .map(
-                    (item) => InkWell(
-                      borderRadius: const .all(.circular(4)),
-                      onTap: () => _searchController.onClickKeyword(item.term!),
-                      child: Padding(
-                        padding: const .only(left: 20, top: 9, bottom: 9),
-                        child: Text.rich(
-                          TextSpan(
-                            children: Em.regTitle(item.textRich)
-                                .map(
-                                  (e) => TextSpan(
-                                    text: e.text,
-                                    style: e.isEm
-                                        ? TextStyle(
-                                            fontWeight: .bold,
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.primary,
-                                          )
-                                        : null,
-                                  ),
-                                )
-                                .toList(),
-                          ),
-                        ),
+          ? SliverList.builder(
+              itemCount: list.length,
+              itemBuilder: (context, index) {
+                final item = list[index];
+                return InkWell(
+                  borderRadius: const .all(.circular(4)),
+                  onTap: () => _searchController.onClickKeyword(item.term!),
+                  child: Padding(
+                    padding: const .only(left: 20, top: 9, bottom: 9),
+                    child: Text.rich(
+                      TextSpan(
+                        children: Em.regTitle(item.textRich)
+                            .map(
+                              (e) => TextSpan(
+                                text: e.text,
+                                style: e.isEm
+                                    ? TextStyle(
+                                        fontWeight: .bold,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.primary,
+                                      )
+                                    : null,
+                              ),
+                            )
+                            .toList(),
                       ),
                     ),
-                  )
-                  .toList(),
+                  ),
+                );
+              },
             )
           : const SliverToBoxAdapter();
     });

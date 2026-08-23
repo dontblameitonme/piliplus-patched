@@ -48,7 +48,58 @@ class _SearchResultPageState extends State<SearchResultPage>
         _tabController.addListener(listener);
       } catch (_) {}
     }
+
+    _tabWidgets = SearchType.values
+        .map(
+          (item) => Obx(
+            () {
+              int count = _searchResultController.count[item.index];
+              return Tab(
+                text:
+                    '${item.label}${count != -1 ? ' ${count > 99 ? '99+' : count}' : ''}',
+              );
+            },
+          ),
+        )
+        .toList();
+
+    final initIdx = Get.arguments?['initIndex'] ?? 0;
+    _pageWidgets = SearchType.values.map((item) {
+      final panel = switch (item) {
+        SearchType.video => SearchVideoPanel(
+          tag: _tag,
+          searchType: item,
+          keyword: _searchResultController.keyword,
+        ),
+        SearchType.media_bangumi ||
+        SearchType.media_ft => SearchPgcPanel(
+          tag: _tag,
+          searchType: item,
+          keyword: _searchResultController.keyword,
+        ),
+        SearchType.live_room => SearchLivePanel(
+          tag: _tag,
+          searchType: item,
+          keyword: _searchResultController.keyword,
+        ),
+        SearchType.bili_user => SearchUserPanel(
+          tag: _tag,
+          searchType: item,
+          keyword: _searchResultController.keyword,
+        ),
+        SearchType.article => SearchArticlePanel(
+          tag: _tag,
+          searchType: item,
+          keyword: _searchResultController.keyword,
+        ),
+      };
+      // Defer inflation of offscreen search panels until user switches to them
+      return item.index == initIdx ? panel : LazyIndexedTab(child: panel);
+    }).toList();
   }
+
+  late final List<Widget> _tabWidgets;
+  late final List<Widget> _pageWidgets;
 
   void listener() {
     sSearchController?.initIndex = _tabController.index;
@@ -105,19 +156,7 @@ class _SearchResultPageState extends State<SearchResultPage>
               splashFactory: NoSplash.splashFactory,
               padding: const EdgeInsets.only(top: 4, left: 8, right: 8),
               controller: _tabController,
-              tabs: SearchType.values
-                  .map(
-                    (item) => Obx(
-                      () {
-                        int count = _searchResultController.count[item.index];
-                        return Tab(
-                          text:
-                              '${item.label}${count != -1 ? ' ${count > 99 ? '99+' : count}' : ''}',
-                        );
-                      },
-                    ),
-                  )
-                  .toList(),
+              tabs: _tabWidgets,
               isScrollable: true,
               indicatorWeight: 0,
               indicatorPadding: const EdgeInsets.symmetric(
@@ -152,43 +191,7 @@ class _SearchResultPageState extends State<SearchResultPage>
             Expanded(
               child: tabBarView(
                 controller: _tabController,
-                children: SearchType.values
-                    .map(
-                      (item) => switch (item) {
-                        // SearchType.all => SearchAllPanel(
-                        //   tag: _tag,
-                        //   searchType: item,
-                        //   keyword: _searchResultController.keyword,
-                        // ),
-                        SearchType.video => SearchVideoPanel(
-                          tag: _tag,
-                          searchType: item,
-                          keyword: _searchResultController.keyword,
-                        ),
-                        SearchType.media_bangumi ||
-                        SearchType.media_ft => SearchPgcPanel(
-                          tag: _tag,
-                          searchType: item,
-                          keyword: _searchResultController.keyword,
-                        ),
-                        SearchType.live_room => SearchLivePanel(
-                          tag: _tag,
-                          searchType: item,
-                          keyword: _searchResultController.keyword,
-                        ),
-                        SearchType.bili_user => SearchUserPanel(
-                          tag: _tag,
-                          searchType: item,
-                          keyword: _searchResultController.keyword,
-                        ),
-                        SearchType.article => SearchArticlePanel(
-                          tag: _tag,
-                          searchType: item,
-                          keyword: _searchResultController.keyword,
-                        ),
-                      },
-                    )
-                    .toList(),
+                children: _pageWidgets,
               ),
             ),
           ],

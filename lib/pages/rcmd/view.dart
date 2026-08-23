@@ -22,6 +22,11 @@ class _RcmdPageState extends State<RcmdPage>
   final RcmdController controller = Get.put(RcmdController());
   bool _loadMoreScheduled = false;
 
+  // Cache grid delegate — LayoutBuilder can fire many times per second during
+  // scrolling; only rebuild when availableWidth actually changes.
+  double? _cachedWidth;
+  SliverGridDelegateWithExtentAndRatio? _cachedGridDelegate;
+
   @override
   bool get wantKeepAlive => true;
 
@@ -70,11 +75,15 @@ class _RcmdPageState extends State<RcmdPage>
   }
 
   SliverGridDelegateWithExtentAndRatio _gridDelegate(double availableWidth) {
+    if (_cachedWidth == availableWidth && _cachedGridDelegate != null) {
+      return _cachedGridDelegate!;
+    }
+    _cachedWidth = availableWidth;
     final isTablet = MediaQuery.sizeOf(context).shortestSide >= 600;
     final maxCrossAxisExtent = isTablet
         ? (availableWidth - Style.cardSpace * 3) / 4
         : Pref.recommendCardWidth;
-    return SliverGridDelegateWithExtentAndRatio(
+    return _cachedGridDelegate = SliverGridDelegateWithExtentAndRatio(
       mainAxisSpacing: Style.cardSpace,
       crossAxisSpacing: Style.cardSpace,
       maxCrossAxisExtent: maxCrossAxisExtent,

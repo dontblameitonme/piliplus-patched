@@ -25,11 +25,24 @@ class _HomePageState extends CommonPageState<HomePage>
   final _homeController = Get.putOrFind(HomeController.new);
   final _mainController = Get.find<MainController>();
 
+  // Cached tab/page lists — tabs never change after init, so build() must not
+  // re-allocate these on every call (e.g. orientation or theme changes).
+  late final List<Tab> _tabWidgets;
+  late final List<Widget> _pageWidgets;
+
   @override
   bool get needsCorrection => _homeController.hideTopBar;
 
   @override
   bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabWidgets =
+        _homeController.tabs.map((e) => Tab(text: e.label)).toList();
+    _pageWidgets = _homeController.tabs.map((e) => e.page).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +57,7 @@ class _HomePageState extends CommonPageState<HomePage>
           width: double.infinity,
           child: TabBar(
             controller: _homeController.tabController,
-            tabs: _homeController.tabs.map((e) => Tab(text: e.label)).toList(),
+            tabs: _tabWidgets,
             isScrollable: true,
             dividerColor: Colors.transparent,
             dividerHeight: 0,
@@ -79,7 +92,7 @@ class _HomePageState extends CommonPageState<HomePage>
           child: onBuild(
             tabBarView(
               controller: _homeController.tabController,
-              children: _homeController.tabs.map((e) => e.page).toList(),
+              children: _pageWidgets,
             ),
           ),
         ),
@@ -117,15 +130,17 @@ class _HomePageState extends CommonPageState<HomePage>
       if (_homeController.showTopBar case final showTopBar?) {
         return Obx(() {
           final showSearchBar = showTopBar.value;
-          return AnimatedOpacity(
-            opacity: showSearchBar ? 1 : 0,
-            duration: const Duration(milliseconds: 300),
-            child: AnimatedContainer(
-              curve: Curves.easeInOutCubicEmphasized,
-              duration: const Duration(milliseconds: 500),
-              height: showSearchBar ? Style.topBarHeight : 0,
-              padding: padding,
-              child: child,
+          return RepaintBoundary(
+            child: AnimatedOpacity(
+              opacity: showSearchBar ? 1 : 0,
+              duration: const Duration(milliseconds: 300),
+              child: AnimatedContainer(
+                curve: Curves.easeInOutCubicEmphasized,
+                duration: const Duration(milliseconds: 500),
+                height: showSearchBar ? Style.topBarHeight : 0,
+                padding: padding,
+                child: child,
+              ),
             ),
           );
         });

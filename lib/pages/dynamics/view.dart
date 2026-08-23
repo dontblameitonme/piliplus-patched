@@ -26,6 +26,13 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
   UpPanelPosition get upPanelPosition => _dynamicsController.upPanelPosition;
   late final MainController _mainController = Get.find<MainController>();
 
+  late final List<Widget> _pageWidgets = DynamicsTabType.values
+      .map((e) => DynamicsTabPage(dynamicsType: e))
+      .toList();
+  late final List<Widget> _tabWidgets = DynamicsTabType.values
+      .map((e) => Tab(text: e.label))
+      .toList();
+
   @override
   bool get wantKeepAlive => true;
 
@@ -126,9 +133,7 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
 
     Widget child = tabBarView(
       controller: _dynamicsController.tabController,
-      children: DynamicsTabType.values
-          .map((e) => DynamicsTabPage(dynamicsType: e))
-          .toList(),
+      children: _pageWidgets,
     );
 
     switch (upPanelPosition) {
@@ -187,9 +192,7 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
             labelStyle:
                 TabBarTheme.of(context).labelStyle?.copyWith(fontSize: 13) ??
                 const TextStyle(fontSize: 13),
-            tabs: DynamicsTabType.values
-                .map((e) => Tab(text: e.label))
-                .toList(),
+            tabs: _tabWidgets,
             onTap: (index) {
               if (!_dynamicsController.tabController.indexIsChanging) {
                 _dynamicsController.animateToTop();

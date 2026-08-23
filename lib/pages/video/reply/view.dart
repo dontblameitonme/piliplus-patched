@@ -142,25 +142,27 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
             Positioned(
               right: 0,
               bottom: 0,
-              child: SlideTransition(
-                position: fabAnimation,
-                child: Padding(
-                  padding: .only(
-                    right: kFloatingActionButtonMargin,
-                    bottom: kFloatingActionButtonMargin + bottom,
-                  ),
-                  child: FloatingActionButton(
-                    heroTag: null,
-                    onPressed: () {
-                      feedBack();
-                      _videoReplyController.onReply(
-                        null,
-                        oid: _videoReplyController.aid,
-                        replyType: _videoReplyController.videoType.replyType,
-                      );
-                    },
-                    tooltip: '发表评论',
-                    child: const Icon(Icons.reply),
+              child: RepaintBoundary(
+                child: SlideTransition(
+                  position: fabAnimation,
+                  child: Padding(
+                    padding: .only(
+                      right: kFloatingActionButtonMargin,
+                      bottom: kFloatingActionButtonMargin + bottom,
+                    ),
+                    child: FloatingActionButton(
+                      heroTag: null,
+                      onPressed: () {
+                        feedBack();
+                        _videoReplyController.onReply(
+                          null,
+                          oid: _videoReplyController.aid,
+                          replyType: _videoReplyController.videoType.replyType,
+                        );
+                      },
+                      tooltip: '发表评论',
+                      child: const Icon(Icons.reply),
+                    ),
                   ),
                 ),
               ),

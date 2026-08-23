@@ -41,7 +41,7 @@ class _MemberHomeState extends State<MemberHome>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return _buildBody(_ctr.loadingState.value);
+    return Obx(() => _buildBody(_ctr.loadingState.value));
   }
 
   late final gridDelegateV = SliverGridDelegateWithExtentAndRatio(

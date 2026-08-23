@@ -43,64 +43,71 @@ class _UpPanelState extends State<UpPanel> {
       physics: const AlwaysScrollableScrollPhysics(),
       controller: controller.scrollController,
       slivers: [
-        SliverToBoxAdapter(
-          child: InkWell(
-            onTap: () => setState(() {
-              controller.showLiveUp = !controller.showLiveUp;
-            }),
-            onLongPress: toFollowPage,
-            onSecondaryTap: PlatformUtils.isMobile ? null : toFollowPage,
-            child: Container(
-              alignment: .center,
-              height: isTop ? 76 : 60,
-              padding: isTop ? const .only(left: 12, right: 6) : null,
-              child: Text.rich(
-                textAlign: .center,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: theme.colorScheme.primary,
-                ),
-                TextSpan(
-                  children: [
-                    TextSpan(
-                      text: 'Live(${upData.liveUsers?.count ?? 0})',
+        // Live section header + expandable list — reactive via showLiveUp RxBool
+        Obx(() {
+          final showLive = controller.showLiveUp.value;
+          return SliverMainAxisGroup(
+            slivers: [
+              SliverToBoxAdapter(
+                child: InkWell(
+                  onTap: () => controller.showLiveUp.value = !showLive,
+                  onLongPress: toFollowPage,
+                  onSecondaryTap: PlatformUtils.isMobile ? null : toFollowPage,
+                  child: Container(
+                    alignment: .center,
+                    height: isTop ? 76 : 60,
+                    padding: isTop ? const .only(left: 12, right: 6) : null,
+                    child: Text.rich(
+                      textAlign: .center,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: theme.colorScheme.primary,
+                      ),
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'Live(${upData.liveUsers?.count ?? 0})',
+                          ),
+                          if (!isTop) ...[
+                            const TextSpan(text: '\n'),
+                            WidgetSpan(
+                              alignment: .middle,
+                              child: Icon(
+                                showLive
+                                    ? Icons.expand_less
+                                    : Icons.expand_more,
+                                size: 12,
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                          ] else
+                            WidgetSpan(
+                              alignment: .middle,
+                              child: Icon(
+                                showLive
+                                    ? Icons.keyboard_arrow_right
+                                    : Icons.keyboard_arrow_left,
+                                color: theme.colorScheme.primary,
+                                size: 14,
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
-                    if (!isTop) ...[
-                      const TextSpan(text: '\n'),
-                      WidgetSpan(
-                        alignment: .middle,
-                        child: Icon(
-                          controller.showLiveUp
-                              ? Icons.expand_less
-                              : Icons.expand_more,
-                          size: 12,
-                          color: theme.colorScheme.primary,
-                        ),
-                      ),
-                    ] else
-                      WidgetSpan(
-                        alignment: .middle,
-                        child: Icon(
-                          controller.showLiveUp
-                              ? Icons.keyboard_arrow_right
-                              : Icons.keyboard_arrow_left,
-                          color: theme.colorScheme.primary,
-                          size: 14,
-                        ),
-                      ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ),
-        ),
-        if (controller.showLiveUp && liveList != null && liveList.isNotEmpty)
-          SliverList.builder(
-            itemCount: liveList.length,
-            itemBuilder: (context, index) {
-              return upItemBuild(theme, liveList[index]);
-            },
-          ),
+              if (showLive && liveList != null && liveList.isNotEmpty)
+                SliverFixedExtentList(
+                  itemExtent: isTop ? 70.0 : 76.0,
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => upItemBuild(theme, liveList[index]),
+                    childCount: liveList.length,
+                  ),
+                ),
+            ],
+          );
+        }),
         SliverToBoxAdapter(
           child: upItemBuild(theme, UpItem(face: '', uname: '全部动态', mid: -1)),
         ),
@@ -117,11 +124,12 @@ class _UpPanelState extends State<UpPanel> {
           ),
         ),
         if (upList != null && upList.isNotEmpty)
-          SliverList.builder(
-            itemCount: upList.length,
-            itemBuilder: (context, index) {
-              return upItemBuild(theme, upList[index]);
-            },
+          SliverFixedExtentList(
+            itemExtent: isTop ? 70.0 : 76.0,
+            delegate: SliverChildBuilderDelegate(
+              (context, index) => upItemBuild(theme, upList[index]),
+              childCount: upList.length,
+            ),
           ),
         if (!isTop) const SliverToBoxAdapter(child: SizedBox(height: 200)),
       ],
