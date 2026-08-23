@@ -61,7 +61,6 @@ import 'package:PiliPlus/utils/num_utils.dart';
 import 'package:PiliPlus/utils/page_utils.dart';
 import 'package:PiliPlus/utils/storage.dart';
 import 'package:PiliPlus/utils/storage_key.dart';
-import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:PiliPlus/utils/theme_utils.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
@@ -193,10 +192,6 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     } else if (state == .paused) {
       introController.cancelTimer();
       ctr.showDanmaku = false;
-      // 失去焦点自动暂停（进入后台）
-      if (Pref.pauseOnFocusLost) {
-        plPlayerController?.pause();
-      }
     }
   }
 
@@ -435,15 +430,19 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     plPlayerController
       ?..addStatusLister(playerListener)
       ..addPositionListener(positionListener);
-    if (videoDetailController.autoPlay) {
-      videoDetailController.playerInit(
-        autoplay: videoDetailController.playerStatus?.isPlaying ?? false,
-      );
-    } else if (videoDetailController.plPlayerController.preInitPlayer &&
-        !videoDetailController.isQuerying &&
-        videoDetailController.videoUrl != null) {
-      videoDetailController.playerInit();
-    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !isShowing) return;
+      if (videoDetailController.autoPlay) {
+        videoDetailController.playerInit(
+          autoplay: videoDetailController.playerStatus?.isPlaying ?? false,
+        );
+      } else if (videoDetailController.plPlayerController.preInitPlayer &&
+          !videoDetailController.isQuerying &&
+          videoDetailController.videoUrl != null) {
+        videoDetailController.playerInit();
+      }
+    });
   }
 
   @override
@@ -574,7 +573,9 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
                       SizedBox(
                         width: maxWidth,
                         height: height,
-                        child: videoPlayer(width: maxWidth, height: height),
+                        child: RepaintBoundary(
+                          child: videoPlayer(width: maxWidth, height: height),
+                        ),
                       ),
                       _buildHeaderOverlay(),
                     ],
@@ -1478,7 +1479,9 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
       children: [
         const Positioned.fill(child: ColoredBox(color: Colors.black)),
 
-        plPlayer(width: width, height: height),
+        RepaintBoundary(
+          child: plPlayer(width: width, height: height),
+        ),
 
         Obx(() {
           if (!videoDetailController.autoPlay) {

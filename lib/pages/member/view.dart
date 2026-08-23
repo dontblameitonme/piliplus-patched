@@ -91,11 +91,16 @@ class _MemberPageState extends State<MemberPage> {
       child: Obx(
         () => switch (_userController.loadingState.value) {
           Loading() => m3eLoading,
-          Success(:final response) => ExtendedNestedScrollView(
-            key: _userController.scrollKey,
-            onlyOneScrollInBody: true,
-            pinnedHeaderSliverHeightBuilder: () =>
-                kToolbarHeight + MediaQuery.viewPaddingOf(context).top,
+          Success(:final response) => ScrollConfiguration(
+            behavior: ScrollConfiguration.of(context).copyWith(
+              overscroll: false,
+            ),
+            child: ExtendedNestedScrollView(
+              key: _userController.scrollKey,
+              physics: const ClampingScrollPhysics(),
+              onlyOneScrollInBody: true,
+              pinnedHeaderSliverHeightBuilder: () =>
+                  kToolbarHeight + MediaQuery.viewPaddingOf(context).top,
             headerSliverBuilder: (context, innerBoxIsScrolled) {
               if (response != null) {
                 return [
@@ -157,6 +162,7 @@ class _MemberPageState extends State<MemberPage> {
                     ),
                   )
                 : scrollableError,
+            ),
           ),
           Error(:final errMsg) => scrollErrorWidget(
             errMsg: errMsg,

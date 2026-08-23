@@ -213,8 +213,8 @@ List<SettingsModel> get playSettings => [
     ),
   if (PlatformUtils.isMobile)
     const SwitchModel(
-      title: '失去焦点自动暂停',
-      subtitle: '进入后台或切换到其他页面时自动暂停播放',
+      title: '应用内失焦自动暂停',
+      subtitle: '在应用内离开播放界面（如点击推荐视频或切换页面）时自动暂停播放',
       leading: Icon(Icons.pause_circle_outline),
       setKey: SettingBoxKey.pauseOnFocusLost,
       defaultVal: false,
