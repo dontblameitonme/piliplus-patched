@@ -99,124 +99,131 @@ class _UgcIntroPanelState extends State<UgcIntroPanel> {
         right: Style.safeSpace,
         top: 10,
       ),
-      sliver: Obx(
-        () {
-          final videoDetail = introController.videoDetail.value;
-          final isLoading = videoDetail.bvid == null;
-          return SliverToBoxAdapter(
-            child: GestureDetector(
-              onTap: () {
-                if (isLoading) return;
-                feedBack();
-                introController.expand.toggle();
-              },
-              child: TranslucentColumn(
-                crossAxisAlignment: .start,
-                children: [
-                  NoTranslucentArea(
-                    child: _buildOwnerInfo(
-                      isLoading,
-                      isPortrait,
-                      isHorizontal,
-                      videoDetail,
-                    ),
+      // Outer Obx ONLY switches between skeleton (isLoading) and content.
+      // Once loaded, videoDetail changes only rebuild each fine-grained
+      // sub-Obx below, not the entire tree.
+      sliver: Obx(() {
+        final videoDetail = introController.videoDetail.value;
+        final isLoading = videoDetail.bvid == null;
+        return SliverToBoxAdapter(
+          child: GestureDetector(
+            onTap: () {
+              if (isLoading) return;
+              feedBack();
+              introController.expand.toggle();
+            },
+            child: TranslucentColumn(
+              crossAxisAlignment: .start,
+              children: [
+                NoTranslucentArea(
+                  // Owner info: avatars, follow button, fan count —
+                  // rebuilt only when videoDetail changes (fine-grained).
+                  child: _buildOwnerInfo(
+                    isLoading,
+                    isPortrait,
+                    isHorizontal,
+                    videoDetail,
                   ),
-                  const SizedBox(height: 8),
-                  buildTitle(isLoading, isHorizontal, videoDetail),
-                  const SizedBox(height: 8),
-                  Stack(
-                    clipBehavior: .none,
-                    children: [
-                      _buildInfo(videoDetail.stat, videoDetail.pubdate),
-                      if (introController.enableAi) _aiBtn,
-                    ],
-                  ),
-                  if (introController.showArgueMsg)
-                    if (videoDetail.argueInfo?.argueMsg case final argueMsg?
-                        when argueMsg.isNotEmpty) ...[
-                      const SizedBox(height: 2),
-                      _buildArgueInfo(argueMsg),
-                    ],
-                  if (isHorizontal && PlatformUtils.isDesktop)
-                    ..._infos(videoDetail)
-                  else
-                    Obx(
-                      () => AnimatedHeight(
-                        expand: introController.expand.value,
-                        duration: const Duration(milliseconds: 300),
-                        child: TranslucentColumn(
-                          mainAxisSize: .min,
-                          crossAxisAlignment: .start,
-                          children: _infos(videoDetail),
-                        ),
-                      ),
-                    ),
-                  Obx(
-                    () => introController.status.value
-                        ? const SizedBox.shrink()
-                        : Center(
-                            child: TextButton.icon(
-                              icon: const Icon(Icons.refresh),
-                              onPressed: () {
-                                introController
-                                  ..status.value = true
-                                  ..queryVideoIntro();
-                                if (videoDetailCtr.videoUrl.isNullOrEmpty &&
-                                    !videoDetailCtr.isQuerying) {
-                                  videoDetailCtr.queryVideoUrl();
-                                }
-                              },
-                              label: const Text("点此重新加载"),
-                            ),
-                          ),
-                  ),
-                  // 点赞收藏转发 布局样式2
-                  if (!isHorizontal) ...[
-                    const SizedBox(height: 8),
-                    actionGrid(
-                      context,
-                      isLoading,
-                      introController,
-                      videoDetail.stat,
-                    ),
+                ),
+                const SizedBox(height: 8),
+                // Title section: has its own internal Obx for expand state
+                buildTitle(isLoading, isHorizontal, videoDetail),
+                const SizedBox(height: 8),
+                // Stats / pubdate: static once loaded, no reactive wrapper needed
+                Stack(
+                  clipBehavior: .none,
+                  children: [
+                    _buildInfo(videoDetail.stat, videoDetail.pubdate),
+                    if (introController.enableAi) _aiBtn,
                   ],
-                  // 合集
-                  if (!isLoading &&
-                      videoDetail.ugcSeason != null &&
-                      (isPortrait ||
-                          !videoDetailCtr
-                              .plPlayerController
-                              .horizontalSeasonPanel))
-                    Obx(
-                      () => SeasonPanel(
-                        key: ValueKey(introController.videoDetail.value),
-                        heroTag: widget.heroTag,
-                        showEpisodes: widget.showEpisodes,
-                        ugcIntroController: introController,
+                ),
+                if (introController.showArgueMsg)
+                  if (videoDetail.argueInfo?.argueMsg case final argueMsg?
+                      when argueMsg.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    _buildArgueInfo(argueMsg),
+                  ],
+                if (isHorizontal && PlatformUtils.isDesktop)
+                  ..._infos(videoDetail)
+                else
+                  // Expand animation: already its own Obx on introController.expand
+                  Obx(
+                    () => AnimatedHeight(
+                      expand: introController.expand.value,
+                      duration: const Duration(milliseconds: 300),
+                      child: TranslucentColumn(
+                        mainAxisSize: .min,
+                        crossAxisAlignment: .start,
+                        children: _infos(videoDetail),
                       ),
                     ),
-                  if (!isLoading &&
-                      videoDetail.pages != null &&
-                      videoDetail.pages!.length > 1 &&
-                      (isPortrait ||
-                          !videoDetailCtr
-                              .plPlayerController
-                              .horizontalSeasonPanel))
-                    Obx(
-                      () => PagesPanel(
-                        key: ValueKey(introController.videoDetail.value),
-                        heroTag: widget.heroTag,
-                        ugcIntroController: introController,
-                        bvid: introController.bvid,
-                        showEpisodes: widget.showEpisodes,
-                      ),
-                    ),
+                  ),
+                // Error / retry: its own Obx on introController.status
+                Obx(
+                  () => introController.status.value
+                      ? const SizedBox.shrink()
+                      : Center(
+                          child: TextButton.icon(
+                            icon: const Icon(Icons.refresh),
+                            onPressed: () {
+                              introController
+                                ..status.value = true
+                                ..queryVideoIntro();
+                              if (videoDetailCtr.videoUrl.isNullOrEmpty &&
+                                  !videoDetailCtr.isQuerying) {
+                                videoDetailCtr.queryVideoUrl();
+                              }
+                            },
+                            label: const Text("点此重新加载"),
+                          ),
+                        ),
+                ),
+                // Action buttons (like/coin/fav/share): each has its own Obx
+                if (!isHorizontal) ...[
+                  const SizedBox(height: 8),
+                  actionGrid(
+                    context,
+                    isLoading,
+                    introController,
+                    videoDetail.stat,
+                  ),
                 ],
-              ),
+                // Season panel: its own Obx wrapper
+                if (!isLoading &&
+                    videoDetail.ugcSeason != null &&
+                    (isPortrait ||
+                        !videoDetailCtr
+                            .plPlayerController
+                            .horizontalSeasonPanel))
+                  Obx(
+                    () => SeasonPanel(
+                      key: ValueKey(introController.videoDetail.value),
+                      heroTag: widget.heroTag,
+                      showEpisodes: widget.showEpisodes,
+                      ugcIntroController: introController,
+                    ),
+                  ),
+                if (!isLoading &&
+                    videoDetail.pages != null &&
+                    videoDetail.pages!.length > 1 &&
+                    (isPortrait ||
+                        !videoDetailCtr
+                            .plPlayerController
+                            .horizontalSeasonPanel))
+                  Obx(
+                    () => PagesPanel(
+                      key: ValueKey(introController.videoDetail.value),
+                      heroTag: widget.heroTag,
+                      ugcIntroController: introController,
+                      bvid: introController.bvid,
+                      showEpisodes: widget.showEpisodes,
+                    ),
+                  ),
+              ],
             ),
-          );
-        },
-      ),
+          ),
+        );
+      }),
     );
   }
 

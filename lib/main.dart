@@ -17,6 +17,7 @@ import 'package:PiliPlus/services/logger.dart';
 import 'package:PiliPlus/services/service_locator.dart';
 import 'package:PiliPlus/utils/cache_manager.dart';
 import 'package:PiliPlus/utils/calc_window_position.dart';
+import 'package:PiliPlus/utils/connectivity_utils.dart';
 import 'package:PiliPlus/utils/date_utils.dart';
 import 'package:PiliPlus/utils/extension/theme_ext.dart';
 import 'package:PiliPlus/utils/json_file_handler.dart';
@@ -104,6 +105,7 @@ void main() async {
     _initDownPath(),
     _initTmpPath(),
     CacheManager.ensureInitialized(),
+    ConnectivityUtils.init(), // pre-cache WiFi state for zero-await queryVideoUrl
   ]);
   Get
     ..lazyPut(AccountService.new)

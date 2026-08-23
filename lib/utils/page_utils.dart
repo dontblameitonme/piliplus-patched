@@ -35,6 +35,7 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:PiliPlus/plugin/pl_player/controller.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 abstract final class PageUtils {
@@ -588,12 +589,19 @@ abstract final class PageUtils {
       ...?extraArguments,
     };
     if (off) {
+      // Always pause before replacing the current video route so that the old
+      // player stops even when we're already on /videoV (tablet side-panel tap)
+      // and didPushNext() is never fired.
+      PlPlayerController.instance?.pause();
       return Get.offNamed(
         '/videoV',
         arguments: arguments,
         preventDuplicates: false,
       );
     } else {
+      // Pause before pushing a new video route as well, so that a
+      // playing video in the background (e.g. tablet right-pane) halts.
+      PlPlayerController.instance?.pause();
       return Get.toNamed(
         '/videoV',
         arguments: arguments,

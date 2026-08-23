@@ -599,8 +599,9 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
                           isNested: true,
                         ),
                         if (videoDetailController.showReply)
-                          videoReplyPanel(isNested: true),
-                        if (_shouldShowSeasonPanel) seasonPanel,
+                          LazyIndexedTab(child: videoReplyPanel(isNested: true)),
+                        if (_shouldShowSeasonPanel)
+                          LazyIndexedTab(child: seasonPanel),
                       ],
                     ),
                   ),
@@ -812,8 +813,10 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
                           width: introWidth,
                           height: maxHeight,
                         ),
-                        if (videoDetailController.showReply) videoReplyPanel(),
-                        if (_shouldShowSeasonPanel) seasonPanel,
+                        if (videoDetailController.showReply)
+                          LazyIndexedTab(child: videoReplyPanel()),
+                        if (_shouldShowSeasonPanel)
+                          LazyIndexedTab(child: seasonPanel),
                       ],
                     ),
                   ),
@@ -874,8 +877,9 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
                             controller: videoDetailController.tabCtr,
                             children: [
                               if (videoDetailController.showReply)
-                                videoReplyPanel(),
-                              if (_shouldShowSeasonPanel) seasonPanel,
+                                LazyIndexedTab(child: videoReplyPanel()),
+                              if (_shouldShowSeasonPanel)
+                                LazyIndexedTab(child: seasonPanel),
                             ],
                           ),
                         ),
@@ -979,8 +983,10 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
                               ],
                             ),
                           ),
-                        if (videoDetailController.showReply) videoReplyPanel(),
-                        if (_shouldShowSeasonPanel) seasonPanel,
+                        if (videoDetailController.showReply)
+                          LazyIndexedTab(child: videoReplyPanel()),
+                        if (_shouldShowSeasonPanel)
+                          LazyIndexedTab(child: seasonPanel),
                       ],
                     ),
                   ),
