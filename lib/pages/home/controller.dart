@@ -80,9 +80,9 @@ class HomeController extends GetxController
   }
 
   @override
-  void dispose() {
+  void onClose() {
     tabController.dispose();
-    super.dispose();
+    super.onClose();
   }
 
   Future<void> querySearchDefault() async {

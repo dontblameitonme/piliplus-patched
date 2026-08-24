@@ -388,6 +388,18 @@ class VideoDetailController extends GetxController
     );
   }
 
+  void updateTabLength(int newLength) {
+    if (tabCtr.length != newLength && newLength > 0) {
+      final oldIndex = tabCtr.index;
+      tabCtr.dispose();
+      tabCtr = TabController(
+        length: newLength,
+        vsync: this,
+        initialIndex: oldIndex.clamp(0, newLength - 1),
+      );
+    }
+  }
+
   Future<void> getMediaList({
     bool isReverse = false,
     bool isLoadPrevious = false,

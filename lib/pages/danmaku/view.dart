@@ -179,12 +179,14 @@ class _PlDanmakuState extends State<PlDanmaku> {
             ? playerController.danmakuOpacity.value
             : 0,
         duration: const Duration(milliseconds: 100),
-        child: DanmakuScreen<DanmakuExtra>(
-          createdController: (e) {
-            playerController.danmakuController = _controller = e;
-          },
-          option: option,
-          size: widget.size,
+        child: RepaintBoundary(
+          child: DanmakuScreen<DanmakuExtra>(
+            createdController: (e) {
+              playerController.danmakuController = _controller = e;
+            },
+            option: option,
+            size: widget.size,
+          ),
         ),
       ),
     );

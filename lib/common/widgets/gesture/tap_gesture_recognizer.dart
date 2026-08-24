@@ -12,3 +12,4 @@ class NoDeadlineTapGestureRecognizer extends TapGestureRecognizer {
   @override
   Duration? get deadline => null;
 }
+

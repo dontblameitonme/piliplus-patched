@@ -1595,11 +1595,18 @@ class PlPlayerController with BlockConfigMixin {
     if (kDebugMode) {
       debugPrint('dispose player');
     }
-    _videoPlayerController?.dispose();
+    final playerToDispose = _videoPlayerController;
     _videoPlayerController = null;
     _videoController = null;
     _instance = null;
     videoPlayerServiceHandler?.clear();
+    if (playerToDispose != null) {
+      Future.microtask(() async {
+        try {
+          await playerToDispose.dispose();
+        } catch (_) {}
+      });
+    }
   }
 
   static void updatePlayCount() {

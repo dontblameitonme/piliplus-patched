@@ -110,6 +110,7 @@ class _SearchResultPageState extends State<SearchResultPage>
     _tabController
       ..removeListener(listener)
       ..dispose();
+    Get.delete<SearchResultController>(tag: _tag);
     super.dispose();
   }
 

@@ -419,4 +419,12 @@ class _WhisperDetailPageState
 
   @override
   void onSave() {}
+
+  @override
+  void dispose() {
+    Get.delete<WhisperDetailController>(
+      tag: Utils.makeHeroTag(Get.parameters['talkerId']),
+    );
+    super.dispose();
+  }
 }

@@ -22,6 +22,7 @@ import 'package:PiliPlus/utils/mobile_observer.dart';
 import 'package:PiliPlus/utils/platform_utils.dart';
 import 'package:PiliPlus/utils/storage.dart';
 import 'package:PiliPlus/utils/storage_key.dart';
+import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -92,10 +93,14 @@ class _MainAppState extends PopScopeState<MainApp>
   @override
   void didPopNext() {
     addObserverMobile(this);
-    _mainController
-      ..checkUnreadDynamic()
-      ..checkDefaultSearch(true)
-      ..checkUnread(_mainController.useBottomNav);
+    Future.delayed(const Duration(milliseconds: 350), () {
+      if (mounted) {
+        _mainController
+          ..checkUnreadDynamic()
+          ..checkDefaultSearch(true)
+          ..checkUnread(_mainController.useBottomNav);
+      }
+    });
     super.didPopNext();
   }
 
@@ -142,8 +147,10 @@ class _MainAppState extends PopScopeState<MainApp>
     if (PlPlayerController.instance?.isDesktopPip ?? false) {
       return;
     }
-    final Offset offset = await windowManager.getPosition();
-    _setting.put(SettingBoxKey.windowPosition, [offset.dx, offset.dy]);
+    EasyDebounce.debounce('window_moved', const Duration(milliseconds: 500), () async {
+      final Offset offset = await windowManager.getPosition();
+      _setting.put(SettingBoxKey.windowPosition, [offset.dx, offset.dy]);
+    });
   }
 
   @override
@@ -151,10 +158,12 @@ class _MainAppState extends PopScopeState<MainApp>
     if (PlPlayerController.instance?.isDesktopPip ?? false) {
       return;
     }
-    final Rect bounds = await windowManager.getBounds();
-    _setting.putAll({
-      SettingBoxKey.windowSize: [bounds.width, bounds.height],
-      SettingBoxKey.windowPosition: [bounds.left, bounds.top],
+    EasyDebounce.debounce('window_resized', const Duration(milliseconds: 500), () async {
+      final Rect bounds = await windowManager.getBounds();
+      _setting.putAll({
+        SettingBoxKey.windowSize: [bounds.width, bounds.height],
+        SettingBoxKey.windowPosition: [bounds.left, bounds.top],
+      });
     });
   }
 

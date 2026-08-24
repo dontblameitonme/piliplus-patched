@@ -79,6 +79,7 @@ class _MemberPageState extends State<MemberPage> {
     _headerController = null;
     _cacheFollowTime = null;
     _cacheMedalData = null;
+    Get.delete<MemberController>(tag: _heroTag);
     super.dispose();
   }
 

@@ -85,7 +85,6 @@ class UgcIntroController extends CommonIntroController with ReloadMixin {
   // 获取视频简介&分p
   @override
   Future<void> queryVideoIntro() async {
-    queryVideoTags();
     final res = await VideoHttp.videoIntro(bvid: bvid);
     if (res case Success(:final response)) {
       if (response.redirectUrl != null &&
@@ -129,15 +128,19 @@ class UgcIntroController extends CommonIntroController with ReloadMixin {
       if (pages != null && pages.isNotEmpty && cid.value == 0) {
         cid.value = pages.first.cid!;
       }
-      queryUserStat(response.staff);
+      Future.microtask(() {
+        if (!isClosed) {
+          queryVideoTags();
+          queryUserStat(response.staff);
+          if (isLogin) {
+            queryAllStatus();
+            queryFollowStatus();
+          }
+        }
+      });
     } else {
       res.toast();
       status.value = false;
-    }
-
-    if (isLogin) {
-      queryAllStatus();
-      queryFollowStatus();
     }
   }
 

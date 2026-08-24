@@ -210,4 +210,12 @@ class _SubDetailPageState extends State<SubDetailPage> with GridMixin {
       ),
     );
   }
+
+  @override
+  void dispose() {
+    Get.delete<SubDetailController>(
+      tag: Utils.makeHeroTag(Get.parameters['id']),
+    );
+    super.dispose();
+  }
 }

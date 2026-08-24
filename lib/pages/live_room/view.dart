@@ -187,6 +187,7 @@ class _LiveRoomPageState extends State<LiveRoomPage>
         tag: '${_liveRoomController.roomId}${e.name}',
       );
     }
+    Get.delete<LiveRoomController>(tag: heroTag);
     super.dispose();
   }
 

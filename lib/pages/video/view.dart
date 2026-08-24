@@ -130,6 +130,23 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
   final videoRelatedKey = GlobalKey();
   final videoIntroKey = GlobalKey();
 
+  bool _isTransitionComplete = false;
+  Animation<double>? _routeAnimation;
+
+  void _onRouteAnimationStatus(AnimationStatus status) {
+    if (status == AnimationStatus.completed) {
+      _routeAnimation?.removeStatusListener(_onRouteAnimationStatus);
+      _initVideoAfterTransition();
+    }
+  }
+
+  void _initVideoAfterTransition() {
+    if (_isTransitionComplete || !mounted) return;
+    _isTransitionComplete = true;
+    videoSourceInit();
+  }
+
+
   @override
   void initState() {
     super.initState();
@@ -160,7 +177,14 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
       pgcIntroController = Get.put(PgcIntroController(), tag: heroTag);
     }
 
-    videoSourceInit();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_isTransitionComplete && mounted) {
+        final anim = ModalRoute.of(context)?.animation;
+        if (anim == null || anim.isCompleted) {
+          _initVideoAfterTransition();
+        }
+      }
+    });
 
     addObserverMobile(this);
   }
@@ -322,6 +346,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
 
   @override
   void dispose() {
+    _routeAnimation?.removeStatusListener(_onRouteAnimationStatus);
     plPlayerController
       ?..removeStatusLister(playerListener)
       ..removePositionListener(positionListener);
@@ -354,6 +379,18 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
       }
     }
     removeObserverMobile(this);
+
+    Get.delete<VideoDetailController>(tag: heroTag);
+    if (videoDetailController.showReply) {
+      Get.delete<VideoReplyController>(tag: heroTag);
+    }
+    if (videoDetailController.isFileSource) {
+      Get.delete<LocalIntroController>(tag: heroTag);
+    } else if (videoDetailController.isUgc) {
+      Get.delete<UgcIntroController>(tag: heroTag);
+    } else {
+      Get.delete<PgcIntroController>(tag: heroTag);
+    }
 
     super.dispose();
   }
@@ -448,6 +485,16 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    if (!_isTransitionComplete) {
+      final modalRoute = ModalRoute.of(context);
+      final anim = modalRoute?.animation;
+      if (anim == null || anim.isCompleted) {
+        _initVideoAfterTransition();
+      } else {
+        _routeAnimation = anim;
+        anim.addStatusListener(_onRouteAnimationStatus);
+      }
+    }
     if (videoDetailController.removeSafeArea) {
       padding = .zero;
     } else {
@@ -640,14 +687,15 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
         ),
       ],
     );
-    return Opacity(
-      opacity: videoDetailController.scrollRatio.value,
-      child: Container(
-        color: themeData.colorScheme.surface,
-        alignment: .topCenter,
-        child: SizedBox(
-          height: kToolbarHeight,
-          child: Stack(
+    if (scrollRatio <= 0.0) {
+      return const SizedBox.shrink();
+    }
+    return Container(
+      color: themeData.colorScheme.surface.withValues(alpha: scrollRatio),
+      alignment: .topCenter,
+      child: SizedBox(
+        height: kToolbarHeight,
+        child: Stack(
             clipBehavior: .none,
             children: [
               Align(
@@ -713,8 +761,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildHeaderOverlay() {
@@ -1331,14 +1378,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
       if (_shouldShowSeasonPanel) '播放列表',
     ];
     if (videoDetailController.tabCtr.length != tabs.length) {
-      videoDetailController.tabCtr.dispose();
-      videoDetailController.tabCtr = TabController(
-        vsync: videoDetailController,
-        length: tabs.length,
-        initialIndex: tabs.isEmpty
-            ? 0
-            : videoDetailController.tabCtr.index.clamp(0, tabs.length - 1),
-      );
+      videoDetailController.updateTabLength(tabs.length);
     }
 
     final flag = !needIndicator || tabs.length == 1;
