@@ -5,7 +5,8 @@ param(
 try {
     $versionName = $null
 
-    $versionCode = [int](git rev-list --count HEAD).Trim()
+    $count = [int](git rev-list --count HEAD).Trim()
+    $versionCode = [Math]::Max(20101, 20000 + $count)
 
     $commitHash = (git rev-parse HEAD).Trim()
 
@@ -39,7 +40,9 @@ try {
 
     $data | ConvertTo-Json -Compress | Out-File 'pili_release.json' -Encoding UTF8
 
-    Add-Content -Path $env:GITHUB_ENV -Value "version=$versionName+$versionCode"
+    if ($env:GITHUB_ENV) {
+        Add-Content -Path $env:GITHUB_ENV -Value "version=$versionName+$versionCode"
+    }
 }
 catch {
     Write-Error "Prebuild Error: $($_.Exception.Message)"
