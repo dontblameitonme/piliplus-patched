@@ -56,7 +56,7 @@ abstract final class GrpcReq {
     String url,
     GeneratedMessage request,
     T Function(Uint8List) grpcParser, {
-    bool isolate = false,
+    bool isolate = true,
   }) async {
     final response = await Request().post<Uint8List>(
       HttpString.appBaseUrl + url,

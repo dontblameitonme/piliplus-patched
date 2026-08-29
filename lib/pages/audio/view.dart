@@ -221,7 +221,7 @@ class _AudioPageState extends State<AudioPage> {
                 sliver: SliverList.builder(
                   itemCount: playlist.length,
                   itemBuilder: (_, index) {
-                    if (index == playlist.length - 1) {
+                    if (index >= playlist.length - 4) {
                       _controller.loadNext(context);
                     }
                     final isCurr = index == _controller.index;

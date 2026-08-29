@@ -125,7 +125,7 @@ class _WhisperPageState extends State<WhisperPage> {
             ? SliverList.separated(
                 itemCount: response.length,
                 itemBuilder: (context, index) {
-                  if (index == response.length - 1) {
+                  if (index >= response.length - 4) {
                     _controller.onLoadMore();
                   }
                   final item = response[index];

@@ -263,7 +263,7 @@ class _LivePageState extends State<LivePage>
               ? SliverGrid.builder(
                   gridDelegate: gridDelegate,
                   itemBuilder: (context, index) {
-                    if (index == response.length - 1) {
+                    if (index >= response.length - 4) {
                       _scheduleLoadMore();
                     }
                     final item = response[index];

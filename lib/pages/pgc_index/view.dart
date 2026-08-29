@@ -239,7 +239,7 @@ class _PgcIndexPageState extends State<PgcIndexPage>
             ? SliverGrid.builder(
                 gridDelegate: gridDelegate,
                 itemBuilder: (context, index) {
-                  if (index == response.length - 1) {
+                  if (index >= response.length - 4) {
                     _ctr.onLoadMore();
                   }
                   return PgcCardVPgcIndex(item: response[index]);

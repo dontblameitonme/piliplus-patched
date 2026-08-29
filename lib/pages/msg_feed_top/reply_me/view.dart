@@ -89,7 +89,7 @@ class _ReplyMePageState extends State<ReplyMePage> {
             ? SliverList.separated(
                 itemCount: response.length,
                 itemBuilder: (context, int index) {
-                  if (index == response.length - 1) {
+                  if (index >= response.length - 4) {
                     _replyMeController.onLoadMore();
                   }
 

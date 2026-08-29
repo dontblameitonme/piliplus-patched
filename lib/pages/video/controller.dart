@@ -718,19 +718,11 @@ class VideoDetailController extends GetxController
             (isFileSource
                 ? true
                 : videoPlayerKey.currentState?.mounted == true)) {
-      // Yield to the next frame so that playerInit's setDataSource never
-      // competes with the route-entry Hero animation on the same vsync budget.
-      final completer = Completer<void>();
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!isClosed) {
-          playerInit(
-            autoFullScreenFlag: autoFullScreenFlag && _autoPlay.value,
-          ).then((_) => completer.complete(), onError: completer.completeError);
-        } else {
-          completer.complete();
-        }
-      });
-      return completer.future;
+      // Already delayed until after route transition in view.dart,
+      // so no need for additional postFrameCallback here.
+      return playerInit(
+        autoFullScreenFlag: autoFullScreenFlag && _autoPlay.value,
+      );
     }
     return null;
   }

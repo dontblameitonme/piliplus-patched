@@ -53,7 +53,7 @@ class _SearchAllPanelState
       ),
       delegate: SliverChildBuilderDelegate(
         (_, index) {
-          if (index == list.length - 1) {
+          if (index >= list.length - 4) {
             controller.onLoadMore();
           }
           return switch (list[index]) {
@@ -81,7 +81,7 @@ class _SearchAllPanelState
                             width: Grid.smallCardWidth / 2,
                             margin: EdgeInsets.only(
                               left: Style.safeSpace,
-                              right: index == e.length - 1
+                              right: index >= e.length - 4
                                   ? Style.safeSpace
                                   : 0,
                             ),

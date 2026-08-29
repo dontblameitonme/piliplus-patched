@@ -186,7 +186,7 @@ class _HorizontalMemberPageState extends State<HorizontalMemberPage> {
                   _buildHeader(theme),
                   SliverFixedExtentList.builder(
                     itemBuilder: (context, index) {
-                      if (index == response.length - 1 && _controller.hasNext) {
+                      if (index >= response.length - 4 && _controller.hasNext) {
                         _controller.onLoadMore();
                       }
                       final videoItem = response[index];

@@ -316,7 +316,7 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
             ? SliverGrid.builder(
                 gridDelegate: gridDelegate,
                 itemBuilder: (context, index) {
-                  if (index == response.length - 1) {
+                  if (index >= response.length - 4) {
                     controller.onLoadMore();
                   }
                   return PgcCardVPgcIndex(item: response[index]);
@@ -406,14 +406,14 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
                 itemCount: response.length,
                 padding: EdgeInsets.zero,
                 itemBuilder: (context, index) {
-                  if (index == response.length - 1) {
+                  if (index >= response.length - 4) {
                     controller.queryPgcFollow(false);
                   }
                   return Container(
                     width: Grid.smallCardWidth / 2,
                     margin: EdgeInsets.only(
                       left: Style.safeSpace,
-                      right: index == response.length - 1 ? Style.safeSpace : 0,
+                      right: index >= response.length - 4 ? Style.safeSpace : 0,
                     ),
                     child: PgcCardV(item: response[index]),
                   );

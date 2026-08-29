@@ -62,7 +62,7 @@ class _MemberComicState extends State<MemberComic>
             ? SliverGrid.builder(
                 gridDelegate: gridDelegate,
                 itemBuilder: (context, index) {
-                  if (index == response.length - 1) {
+                  if (index >= response.length - 4) {
                     _controller.onLoadMore();
                   }
                   return MemberComicItem(item: response[index]);

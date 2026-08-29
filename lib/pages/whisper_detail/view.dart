@@ -163,7 +163,7 @@ class _WhisperDetailPageState
                 ),
                 controller: _whisperDetailController.scrollController,
                 itemBuilder: (context, int index) {
-                  if (index == response.length - 1) {
+                  if (index >= response.length - 4) {
                     _whisperDetailController.onLoadMore();
                   }
                   final item = response[index];

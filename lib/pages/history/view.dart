@@ -200,7 +200,7 @@ class _HistoryPageState extends State<HistoryPage>
             ? SliverGrid.builder(
                 gridDelegate: gridDelegateFor(context),
                 itemBuilder: (context, index) {
-                  if (index == response.length - 1) {
+                  if (index >= response.length - 4) {
                     _historyController.onLoadMore();
                   }
                   final item = response[index];

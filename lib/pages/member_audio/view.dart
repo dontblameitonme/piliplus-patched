@@ -109,7 +109,7 @@ class _MemberAudioState extends State<MemberAudio>
                   SliverGrid.builder(
                     gridDelegate: gridDelegate,
                     itemBuilder: (context, index) {
-                      if (index == response.length - 1) {
+                      if (index >= response.length - 4) {
                         _controller.onLoadMore();
                       }
                       return MemberAudioItem(

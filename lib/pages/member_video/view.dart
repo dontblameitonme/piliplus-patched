@@ -197,7 +197,7 @@ class _MemberVideoState extends State<MemberVideo>
                     gridDelegate: gridDelegate,
                     itemBuilder: (context, index) {
                       if (widget.type != .season &&
-                          index == response.length - 1) {
+                          index >= response.length - 4) {
                         _controller.onLoadMore();
                       }
                       return VideoCardHMemberVideo(

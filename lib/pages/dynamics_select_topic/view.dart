@@ -196,7 +196,7 @@ class _SelectTopicPanelState
                 ),
                 controller: widget.scrollController,
                 itemBuilder: (context, index) {
-                  if (index == response.length - 1) {
+                  if (index >= response.length - 4) {
                     _controller.onLoadMore();
                   }
                   return DynTopicItem(

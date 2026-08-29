@@ -17,8 +17,26 @@ import 'package:get/get.dart';
 
 const _linkFoldedText = '网页链接';
 
+// Cache for TextSpan results, keyed by (item, brightness)
+final Expando<Map<Brightness, TextSpan?>> _richNodeCache = Expando();
+
 // 富文本
 TextSpan? richNode(
+  BuildContext context, {
+  required ThemeData theme,
+  required DynamicItemModel item,
+}) {
+  final brightness = theme.brightness;
+  final cache = _richNodeCache[item] ??= {};
+  if (cache.containsKey(brightness)) {
+    return cache[brightness];
+  }
+  final result = _buildRichNode(context, theme: theme, item: item);
+  cache[brightness] = result;
+  return result;
+}
+
+TextSpan? _buildRichNode(
   BuildContext context, {
   required ThemeData theme,
   required DynamicItemModel item,

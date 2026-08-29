@@ -216,17 +216,22 @@ class LiveMessageStream {
       final Uint8List data = value is Uint8List
           ? value
           : Uint8List.fromList(value);
-      final subHeader = PackageHeaderRes.fromBytesData(data);
-      if (subHeader != null) {
+      int offset = 0;
+      while (offset < data.length) {
+        final subHeader = PackageHeaderRes.fromBytesData(
+          Uint8List.sublistView(data, offset),
+        );
+        if (subHeader == null) break;
         final msgBody = utf8.decode(
-          data.sublist(subHeader.headerSize, subHeader.totalSize),
+          data.sublist(
+            offset + subHeader.headerSize,
+            offset + subHeader.totalSize,
+          ),
         );
         for (final f in _eventListeners) {
           f(jsonDecode(msgBody));
         }
-        if (subHeader.totalSize < data.length) {
-          _processingData(data.sublist(subHeader.totalSize));
-        }
+        offset += subHeader.totalSize;
       }
     } catch (_) {}
   }
