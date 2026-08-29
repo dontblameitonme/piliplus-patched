@@ -1,5 +1,3 @@
-import 'dart:math' show pow;
-
 abstract final class DurationUtils {
   static String formatDuration(num? seconds) {
     if (seconds == null || seconds == 0) {
@@ -18,14 +16,18 @@ abstract final class DurationUtils {
   }
 
   static final _splitRegex = RegExp(r'[:：]');
+  /// Parses formatted duration string (e.g. "01:23:45" or "03:45") into total seconds.
+  /// Performance optimization: Single-pass forward evaluation (Horner's method)
+  /// avoids overhead of reversing lists, mapping functions, and calling `pow()`.
   static int parseDuration(String? data) {
     if (data == null || data.isEmpty) {
       return 0;
     }
-    List<int> split = data.split(_splitRegex).reversed.map(int.parse).toList();
+    final parts = data.split(_splitRegex);
     int duration = 0;
-    for (int i = 0; i < split.length; i++) {
-      duration += split[i] * pow(60, i).toInt();
+    for (int i = 0; i < parts.length; i++) {
+      final part = int.tryParse(parts[i]) ?? 0;
+      duration = duration * 60 + part;
     }
     return duration;
   }
