@@ -87,6 +87,12 @@ class ReplyItemGrpc extends StatelessWidget {
 
   static final _voteRegExp = RegExp(r"^\{vote:\d+?\}$");
   static final _timeRegExp = RegExp(r'^(?:\d+[:：])?\d+[:：]\d+$');
+  // Cache RegExp instances to avoid re-compiling regular expressions on every link tap
+  static final _avBvRegExp = RegExp(r'^(av|bv)', caseSensitive: false);
+  static final _cvidRegExp = RegExp(
+    r'^cv(\d+)$|/read/cv(\d+)|note-app/view\?cvid=(\d+)',
+    caseSensitive: false,
+  );
   static final Expando<RegExp> _messagePatterns = Expando();
   static bool enableWordRe = Pref.enableWordRe;
   static int? replyLengthLimit = Pref.replyLengthLimit;
@@ -770,16 +776,10 @@ class ReplyItemGrpc extends StatelessWidget {
           recognizer: NoDeadlineTapGestureRecognizer()
             ..onTap = () {
               if (url.appUrlSchema.isEmpty) {
-                if (RegExp(
-                  r'^(av|bv)',
-                  caseSensitive: false,
-                ).hasMatch(matchStr)) {
+                if (_avBvRegExp.hasMatch(matchStr)) {
                   UrlUtils.matchUrlPush(matchStr, '');
                 } else {
-                  RegExpMatch? match = RegExp(
-                    r'^cv(\d+)$|/read/cv(\d+)|note-app/view\?cvid=(\d+)',
-                    caseSensitive: false,
-                  ).firstMatch(matchStr);
+                  RegExpMatch? match = _cvidRegExp.firstMatch(matchStr);
                   String? cvid =
                       match?.group(1) ?? match?.group(2) ?? match?.group(3);
                   if (cvid != null) {
