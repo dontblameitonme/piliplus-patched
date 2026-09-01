@@ -1,5 +1,3 @@
-import 'dart:math' show pow;
-
 abstract final class DurationUtils {
   static String formatDuration(num? seconds) {
     if (seconds == null || seconds == 0) {
@@ -17,17 +15,39 @@ abstract final class DurationUtils {
         : "${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')}:$sms";
   }
 
-  static final _splitRegex = RegExp(r'[:：]');
+  /// Parses formatted time string (e.g. "01:23:45" or "23：45") into total seconds.
+  /// Performance optimized: avoids RegExp matching, split allocations, list reversals,
+  /// closures, and floating-point pow calculations.
   static int parseDuration(String? data) {
     if (data == null || data.isEmpty) {
       return 0;
     }
-    List<int> split = data.split(_splitRegex).reversed.map(int.parse).toList();
-    int duration = 0;
-    for (int i = 0; i < split.length; i++) {
-      duration += split[i] * pow(60, i).toInt();
+
+    int totalSeconds = 0;
+    int currentPart = 0;
+    bool hasDigit = false;
+
+    for (int i = 0; i < data.length; i++) {
+      final code = data.codeUnitAt(i);
+      // '0'..'9'
+      if (code >= 0x30 && code <= 0x39) {
+        currentPart = currentPart * 10 + (code - 0x30);
+        hasDigit = true;
+      } else if (code == 0x3A || code == 0xFF1A) {
+        // ':' (0x3A) or '：' (0xFF1A)
+        if (hasDigit) {
+          totalSeconds = totalSeconds * 60 + currentPart;
+          currentPart = 0;
+          hasDigit = false;
+        }
+      }
     }
-    return duration;
+
+    if (hasDigit) {
+      totalSeconds = totalSeconds * 60 + currentPart;
+    }
+
+    return totalSeconds;
   }
 
   static String formatDurationBetween(int startMillis, int endMillis) =>
